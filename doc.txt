@@ -1,0 +1,21 @@
+time series- ARCH, GARCH, ARIMA (moving average, derivatives, remove outliers)
+Image - conv net(scale, resize, annotating, smmothning)
+Text data- Linear models, Vowpal wabbit, Factorization machines(libFm), SVD(tfidf, countvectorizers, word2vec
+svd(dim reduction), stemming, onehot encoding, hashing)
+Normal data- Xgboost, tensorflow, keras(deep-learn) (univariate feature transformation(log_+1), feature selection
+convert categories, remove outliers)
+
+
+Data transformation -  scaling, removing outliers, null values, transform categorical features, create features interaction
+
+start from null model- keep on adding features/ start from full model remove features
+
+feature importance- random forest, xgb
+
+
+Cross validation techinques-
+Kfold, stratified kfold, random split,
+
+Missing values-
+mean, mode, median imputation
+use out of range values -9999
