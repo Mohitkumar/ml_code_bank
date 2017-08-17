@@ -25,11 +25,11 @@ def get_train_data_processed():
             lbl = LabelEncoder()
             lbl.fit(list(train[c].values))
             train[c] = lbl.transform(list(train[c].values))
-    cols_to_use = [x for x in train.columns if x not in list(['ID', 'datetime'])]
+    cols_to_use = [x for x in train.columns if x not in list(['ID', 'datetime', 'click'])]
     scaler = StandardScaler().fit(train[cols_to_use])
 
     strain = scaler.transform(train[cols_to_use])
-    return strain
+    return strain, train['click']
 
 
 def check_missing(train):
