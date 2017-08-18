@@ -29,7 +29,7 @@ def get_train_data_processed():
     scaler = StandardScaler().fit(train[cols_to_use])
 
     strain = scaler.transform(train[cols_to_use])
-    return strain, train['click']
+    return strain, np.array(train['click'])
 
 def get_test_data_processed():
     train = pd.read_csv('/home/mohit/comp_data/test.csv')

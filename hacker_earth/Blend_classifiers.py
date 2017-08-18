@@ -12,19 +12,19 @@ shuffle = False
 
 if __name__ == '__main__':
     X, y = get_train_data_processed();
+    print X.shape, y.shape
     X_submission = get_test_data_processed()
     if shuffle:
         idx = np.random.permutation(y.size)
         X = X[idx]
         y = y[idx]
+    skf = list(StratifiedKFold(n_splits=n_folds).split(X, y))
 
-    kfold = StratifiedKFold(n_splits=n_folds)
-    skf = list(kfold.split(X, y))
-    clfs = [RandomForestClassifier(n_estimators=300, n_jobs=-1, criterion='gini'),
+    clfs = [XGBClassifier(learning_rate=0.05, subsample=0.5, max_depth=6, n_estimators=300),
+            RandomForestClassifier(n_estimators=300, n_jobs=-1, criterion='gini'),
             RandomForestClassifier(n_estimators=300, n_jobs=-1, criterion='entropy'),
             ExtraTreesClassifier(n_estimators=300, n_jobs=-1, criterion='gini'),
-            ExtraTreesClassifier(n_estimators=300, n_jobs=-1, criterion='entropy'),
-            XGBClassifier(learning_rate=0.05, subsample=0.5, max_depth=6, n_estimators=300)]
+            ExtraTreesClassifier(n_estimators=300, n_jobs=-1, criterion='entropy')]
 
     print "Creating train and test sets for blending."
 
