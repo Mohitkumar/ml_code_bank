@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-import  random
+import random
 from sklearn.preprocessing import LabelEncoder,StandardScaler
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -30,6 +30,25 @@ def get_train_data_processed():
 
     strain = scaler.transform(train[cols_to_use])
     return strain, train['click']
+
+def get_test_data_processed():
+    train = pd.read_csv('/home/mohit/comp_data/test.csv')
+    train.drop(labels=['siteid','devid','category','offerid'], axis=1, inplace=True)
+    train = train.ix[random.sample(train.index,train.size/20)]
+    train['datetime'] = pd.to_datetime(train['datetime'])
+    train['thour'] = train['datetime'].dt.hour
+
+    train['browserid'].fillna("None", inplace=True)
+    for c in list(train.select_dtypes(include=['object']).columns):
+        if c != 'ID':
+            lbl = LabelEncoder()
+            lbl.fit(list(train[c].values))
+            train[c] = lbl.transform(list(train[c].values))
+    cols_to_use = [x for x in train.columns if x not in list(['ID', 'datetime'])]
+    scaler = StandardScaler().fit(train[cols_to_use])
+
+    strain = scaler.transform(train[cols_to_use])
+    return strain
 
 
 def check_missing(train):
