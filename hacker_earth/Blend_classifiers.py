@@ -19,7 +19,7 @@ if __name__ == '__main__':
         y = y[idx]
 
     kfold = StratifiedKFold(n_splits=n_folds)
-    skf = kfold.split(X, y)
+    skf = list(kfold.split(X, y))
     clfs = [RandomForestClassifier(n_estimators=300, n_jobs=-1, criterion='gini'),
             RandomForestClassifier(n_estimators=300, n_jobs=-1, criterion='entropy'),
             ExtraTreesClassifier(n_estimators=300, n_jobs=-1, criterion='gini'),
@@ -34,7 +34,7 @@ if __name__ == '__main__':
     for j, clf in enumerate(clfs):
         print j, clf
         dataset_blend_test_j = np.zeros((X_submission.shape[0], len(skf)))
-        for i, (train, test) in skf:
+        for i, (train, test) in enumerate(skf):
             print "Fold", i
             X_train = X[train]
             y_train = y[train]
@@ -58,4 +58,4 @@ if __name__ == '__main__':
     print "Saving Results."
     tmp = np.vstack([range(1, len(y_submission) + 1), y_submission]).T
     np.savetxt(fname='submission.csv', X=tmp, fmt='%d,%0.9f',
-               header='MoleculeId,PredictedProbability', comments='')
+               header='clickId,prob', comments='')
