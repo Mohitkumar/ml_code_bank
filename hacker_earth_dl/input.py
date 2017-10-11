@@ -16,7 +16,7 @@ def read_images(filename_queue):
     label = filename_queue[1]
     img = tf.read_file(filename_queue[0])
     img = tf.image.decode_jpeg(img,channels=3)
-    img = tf.image.resize_images(img, [128, 128])
+    img = tf.image.resize_images(img, [256, 256])
     img = tf.cast(img, tf.float32) * (1. / 255) - 0.5
     out_label = tf.one_hot(label,depth=len(CLASSES),on_value=1.0, off_value=0.0,axis=-1)
     return out_label,img

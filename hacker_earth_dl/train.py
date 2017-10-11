@@ -3,12 +3,11 @@ import input
 import os
 import re
 
-img_size = 128
+img_size = 256
 num_channels = 3
 train_path = '/home/mohit/hacker/train_img'
 validation_path = '/home/mohit/hacker/eval_img'
 label_file = '/home/mohit/hacker/train.csv'
-classes = ['approved', 'rejected']
 num_classes = len(input.CLASSES)
 batch_size = 16
 FLAGS = tf.app.flags.FLAGS

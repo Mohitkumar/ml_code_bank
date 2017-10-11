@@ -1,8 +1,16 @@
-from sklearn.model_selection import StratifiedKFold
-import numpy as np
-X = np.ones(10)
-y = np.array([0, 0, 0, 0, 1, 1, 1, 1, 1, 1])
-skf = StratifiedKFold(n_splits=3)
-for i,(train, test) in enumerate(list(skf.split(X, y))):
-   print("%s %s" % (y[train], y[test]))
+arr = [1,0,0,1,0,1,0,0,1,0,1]
 
+temp = 0
+ls = 0
+rs = 0
+for i in range(len(arr)):
+    if arr[i] == 1:
+        ls += i -temp
+        temp +=1
+temp =0
+for i in reversed(range(len(arr))):
+    if arr[i] == 1:
+        rs += len(arr) -1- i -temp
+        temp +=1
+print ls, rs
+print min(ls,rs)
