@@ -1,16 +1,19 @@
-arr = [1,0,0,1,0,1,0,0,1,0,1]
+import pandas as pd
 
-temp = 0
-ls = 0
-rs = 0
-for i in range(len(arr)):
-    if arr[i] == 1:
-        ls += i -temp
-        temp +=1
-temp =0
-for i in reversed(range(len(arr))):
-    if arr[i] == 1:
-        rs += len(arr) -1- i -temp
-        temp +=1
-print ls, rs
-print min(ls,rs)
+pos_tweets = [('I love this car', 'positive'),
+('This view is amazing', 'positive'),
+('I feel great this morning', 'positive'),
+('I am so excited about the concert', 'positive'),
+('He is my best friend', 'positive')]
+
+test = pd.DataFrame(pos_tweets)
+
+
+test.columns = ["tweet","col2"]
+
+test["tweet"] = test["tweet"].str.lower().str.split()
+
+stop = ['love','car','amazing']
+
+test['tweet'] = test['tweet'].apply(lambda x: [item for item in x if item not in stop]).apply(lambda x: ' '.join(x))
+print test
