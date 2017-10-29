@@ -31,7 +31,15 @@ def clean_and_store():
 def train():
     with open('cleaned_data','r') as f:
         document = pickle.load(f)
-    random.shuffle(document)
+        all_words = nltk.FreqDist(x for w,label in document for x in w)
+        word_features = list(all_words)[:2000]
+        print word_features
+        featuresets = [(document_features(d, word_features), c) for (d, c) in document]
+        print "done extracting features"
+        train_set, test_set = featuresets[100:], featuresets[:100]
+        classifier = nltk.NaiveBayesClassifier.train(train_set)
+        print(nltk.classify.accuracy(classifier, test_set))
+
 
 
 def get_word_features():
@@ -42,10 +50,10 @@ def get_word_features():
     word_features = list(all_words)[:2000]
     return word_features
 
-def document_features(document):
+def document_features(document,feats):
     document_words = set(document)
     features = {}
-    for word in get_word_features():
+    for word in feats:
         features['contains({})'.format(word)] = (word in document_words)
     return features
 
@@ -53,12 +61,14 @@ def train_direct():
     data = pd.read_csv("/home/mohit/Downloads/f2c2f440-8-dataset_he/train.csv")
     data.drop(['Browser_Used', 'Device_Used', 'User_ID'], axis=1, inplace=True)
     document = [(preprocess(text), res) for text, res in zip(data['Description'], data['Is_Response'])]
-    featuresets = [(document_features(d), c) for (d, c) in document]
+    print "done preprocsssing0"
+    featuresets = [(document_features(d, get_word_features()), c) for (d, c) in document]
+    print "done extracting features"
     train_set, test_set = featuresets[100:], featuresets[:100]
     classifier = nltk.NaiveBayesClassifier.train(train_set)
     print(nltk.classify.accuracy(classifier, test_set))
 
 if __name__ == '__main__':
-    train_direct()
+    train()
     #doc=[[[1,2,3]]]
     #print [y for t in doc for z in t for y in z]

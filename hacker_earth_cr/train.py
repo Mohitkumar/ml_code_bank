@@ -10,18 +10,10 @@ import nltk
 from nltk.corpus import stopwords
 import string
 import re
-#nltk.download('stopwords')
 np.random.seed(12)
 
 def tokenize(text):
     text = "".join([ch for ch in text if ch not in string.punctuation])
-    text = re.sub(r"not good","notgood ",text)
-    text = re.sub(r"not come", "notcome ", text)
-    text = re.sub(r"not happy", "nothappy ", text)
-    text = re.sub(r"not available", "notavailable ", text)
-    text = re.sub(r"not ready", "notready ", text)
-    text = re.sub(r"not stay", "notstay ", text)
-    text = re.sub(r"never come", "notcome ", text)
     tokens = nltk.word_tokenize(text)
     return tokens
 
@@ -31,7 +23,9 @@ train, test = train_test_split(data, test_size=0.2)
 #train = data
 
 lemma = nltk.WordNetLemmatizer()
+stopw = set(stopwords.words('english'))
 
+print stopw
 
 class StemmedCountVectorizer(CountVectorizer):
     def build_analyzer(self):
@@ -39,8 +33,7 @@ class StemmedCountVectorizer(CountVectorizer):
         return lambda doc: ([lemma.lemmatize(w,pos='v') for w in analyzer(doc)])
 sgd = SGDClassifier(loss='hinge', penalty='l2', alpha=1e-3, random_state=42)
 mnb = MultinomialNB(fit_prior=False)
-clf = Pipeline([('vect',StemmedCountVectorizer(max_df=0.95, min_df=2,tokenizer=tokenize, stop_words=stopwords.words('english'))),
-                ('tfidf',TfidfTransformer()),
+clf = Pipeline([('vect',StemmedCountVectorizer(tokenizer=tokenize, stop_words=stopw)),
                 ('clf', mnb)])
 clf.fit(train['Description'], train['Is_Response'])
 
@@ -52,5 +45,5 @@ clf.fit(train['Description'], train['Is_Response'])
 #out.to_csv('out.csv', index=False)
 predict = clf.predict(test['Description'])
 print np.mean(predict == test['Is_Response'])
-print metrics.classification_report(test['Is_Response'],predict,['happy', 'not happy'])
+print metrics.classification_report(test['Is_Response'],predict,['not happy', 'happy'])
 
