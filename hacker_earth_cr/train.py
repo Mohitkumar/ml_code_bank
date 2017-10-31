@@ -13,7 +13,7 @@ import re
 np.random.seed(12)
 
 def tokenize(text):
-    text = "".join([ch for ch in text if ch not in string.punctuation])
+    text = "".join([ch if ch not in string.punctuation else ' ' for ch in text])
     tokens = nltk.word_tokenize(text)
     return tokens
 
