@@ -10,6 +10,7 @@ import nltk
 from nltk.corpus import stopwords
 import string
 import re
+nltk.download()
 np.random.seed(12)
 
 def tokenize(text):
@@ -17,7 +18,7 @@ def tokenize(text):
     tokens = nltk.word_tokenize(text)
     return tokens
 
-data = pd.read_csv("/home/mohit/Downloads/f2c2f440-8-dataset_he/train.csv")
+data = pd.read_csv("/home/mohit/ml_data/train.csv")
 data.drop(['Browser_Used','Device_Used','User_ID'], axis=1, inplace=True)
 train, test = train_test_split(data, test_size=0.2)
 #train = data

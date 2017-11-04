@@ -23,14 +23,14 @@ def preprocess(text):
 
 
 def clean_and_store():
-    data = pd.read_csv("/home/mohit/Downloads/f2c2f440-8-dataset_he/train.csv")
+    data = pd.read_csv("/home/mohit/ml_data/train.csv")
     document =[(preprocess(text),res) for text,res in zip(data['Description'], data['Is_Response'])]
     with open('cleaned_data', 'wb') as f:
         pickle.dump(document,f,2)
 
 
 def get_word_features():
-    data = pd.read_csv("/home/mohit/Downloads/f2c2f440-8-dataset_he/train.csv")
+    data = pd.read_csv("/home/mohit/ml_data/train.csv")
     data.drop(['Browser_Used', 'Device_Used', 'User_ID'], axis=1, inplace=True)
     text = data['Description'].apply(preprocess)
     all_words = nltk.FreqDist(x for w in text for x in w)
@@ -56,6 +56,28 @@ def store_frequent_words():
         pickle.dump(word_features,f,2)
 
 
+def get_frequent_suffixes():
+    with open('cleaned_data', 'r') as f1:
+        document = pickle.load(f1)
+    suffix_fdist = nltk.FreqDist()
+    for word_list, label in document:
+        for word in word_list:
+            suffix_fdist[word[-1:]] += 1
+            suffix_fdist[word[-2:]] += 1
+            suffix_fdist[word[-3:]] += 1
+
+    common_suffixes = [suffix for (suffix, count) in suffix_fdist.most_common(100)]
+    print common_suffixes
+    return common_suffixes
+
+
+def pos_features(word, common_suffixes):
+     features = {}
+     for suffix in common_suffixes:
+         features['endswith({})'.format(suffix)] = word.lower().endswith(suffix)
+     return features
+
+
 def train():
     with open('cleaned_data','r') as f:
         document = pickle.load(f)
@@ -66,9 +88,16 @@ def train():
     print word_features
     featuresets = [(document_features(d, word_features), c) for (d, c) in document]
     print "done extracting features"
-    train_set, test_set = featuresets[100:], featuresets[:100]
-    classifier = nltk.NaiveBayesClassifier.train(train_set)
-    print(nltk.classify.accuracy(classifier, test_set))
+
+    ferquent_suffixes = get_frequent_suffixes()
+    pos_featureset = [(pos_features(d, ferquent_suffixes), c) for (d, c) in document]
+    print "done extracting pos features"
+
+    test_split = len(featuresets)/5
+    train_set, test_set = featuresets[test_split:], featuresets[:test_split]
+    train_set1, test_set1 = pos_featureset[test_split:], pos_featureset[:test_split]
+    classifier = nltk.NaiveBayesClassifier.train(train_set+train_set1)
+    print(nltk.classify.accuracy(classifier, test_set+test_set1))
 
 
 if __name__ == '__main__':
