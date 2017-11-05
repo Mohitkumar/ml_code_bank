@@ -16,8 +16,14 @@ def load_document():
     return document
 
 
-def pad_sentences(sentences):
-    max_length = max(len(x) for x in sentences)
+def load_test_sentences():
+    with open('cleaned_data_test', 'r') as f:
+        sentences = pickle.load(f)
+    return sentences
+
+
+def pad_sentences(sentences, test_sentences):
+    max_length = max(len(x) for x in sentences + test_sentences)
     padded_sentence = []
     for i in range(len(sentences)):
         sentence = sentences[i]
@@ -41,15 +47,25 @@ def build_input_data(sentences, labels, vocab):
     return [x,y]
 
 
+def get_vocab():
+    with open('vocab','r') as f:
+        vocab = pickle.load(f)
+    return vocab
+
+
 def load_data():
     doc = load_document();
+    test_sentences = load_test_sentences()
     sentences = []
     labels = []
     for sent, label in doc:
         sentences.append(sent)
         labels.append(label)
-    sentence_padded = pad_sentences(sentences)
-    vocab, vocab_inv = build_vocab(sentence_padded)
+    sentence_padded = pad_sentences(sentences, test_sentences)
+    vocab, vocab_inv = build_vocab(sentence_padded + test_sentences)
+    with open('vocab','wb') as f:
+        pickle.dump(vocab, f, 2)
+
     x,y = build_input_data(sentence_padded, labels,vocab)
     return [x,y,vocab, vocab_inv]
 
@@ -120,7 +136,7 @@ def sym_gen(batch_size, sentence_size, num_embed,
     return sm, ('data',), ('softmax_label',)
 
 
-def train(symbol, train_iter, valid_iter, data_names, label_names, batch_size):
+def train(symbol, train_iter, valid_iter, data_names, label_names, batch_size, num_epoch):
     import logging
     logging.getLogger().setLevel(logging.DEBUG)
     module = mx.mod.Module(symbol, data_names=data_names, label_names=label_names, context=mx.cpu())
@@ -131,14 +147,15 @@ def train(symbol, train_iter, valid_iter, data_names, label_names, batch_size):
                optimizer_params={'learning_rate':0.01},
                initializer=mx.initializer.Uniform(0.1),
                batch_end_callback=mx.callback.Speedometer(batch_size,20),
-               num_epoch=10,
+               num_epoch=num_epoch,
                epoch_end_callback=save_model())
 
 
 if __name__ == '__main__':
     batch_size = 10
-    num_embed = 128
+    num_embed = 256
     num_filter = 128
+    num_epoch = 20
     train_iter, valid_iter, sentence_size, embed_size, vocab_size = data_iter(batch_size,num_embed)
     symbol, data_names, label_names = sym_gen(batch_size,sentence_size,embed_size,vocab_size,num_filter=num_filter,dropout=0.0)
-    train(symbol,train_iter,valid_iter,data_names, label_names, batch_size)
+    train(symbol,train_iter,valid_iter,data_names, label_names, batch_size, num_epoch=20)
