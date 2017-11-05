@@ -130,15 +130,15 @@ def train(symbol, train_iter, valid_iter, data_names, label_names, batch_size):
                optimizer='sgd',
                optimizer_params={'learning_rate':0.01},
                initializer=mx.initializer.Uniform(0.1),
+               batch_end_callback=mx.callback.Speedometer(batch_size,20),
                num_epoch=10,
-               batch_end_callback=mx.callback.Speedometer(batch_size, 100),
                epoch_end_callback=save_model())
 
 
 if __name__ == '__main__':
-    batch_size = 100
-    num_embed = 2000
-    num_filter = 100
+    batch_size = 10
+    num_embed = 128
+    num_filter = 128
     train_iter, valid_iter, sentence_size, embed_size, vocab_size = data_iter(batch_size,num_embed)
     symbol, data_names, label_names = sym_gen(batch_size,sentence_size,embed_size,vocab_size,num_filter=num_filter,dropout=0.0)
     train(symbol,train_iter,valid_iter,data_names, label_names, batch_size)
