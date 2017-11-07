@@ -18,8 +18,8 @@ def preprocess(text):
     text = "".join([ch if ch not in string.punctuation else ' ' for ch in text])
     text = re.sub(r'[^\x00-\x7F]+', ' ', text)
     tokens = nltk.word_tokenize(text)
-    tokens = [token.lower() for token in tokens if token.lower() not in stopwords.words('english')]
-    return [stemmer.stem(w) for w in tokens]
+    tokens = [token.lower() for token in tokens]
+    return tokens
 
 
 def clean_and_store():
@@ -28,6 +28,12 @@ def clean_and_store():
     with open('cleaned_data', 'wb') as f:
         pickle.dump(document,f,2)
 
+
+def clean_and_store_test():
+    data = pd.read_csv("/home/mohit/ml_data/test.csv")
+    document = [preprocess(text) for text in data['Description']]
+    with open('cleaned_data_test', 'wb') as f:
+        pickle.dump(document, f, 2)
 
 def get_word_features():
     data = pd.read_csv("/home/mohit/ml_data/train.csv")
@@ -101,6 +107,6 @@ def train():
 
 
 if __name__ == '__main__':
-    train()
+    clean_and_store_test()
     #doc=[[[1,2,3]]]
     #print [y for t in doc for z in t for y in z]
