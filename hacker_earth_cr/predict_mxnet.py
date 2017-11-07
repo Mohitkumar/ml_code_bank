@@ -10,6 +10,7 @@ def get_sentences():
         sentences = pickle.load(f)
     return sentences
 
+
 def pad_sentences(sentences):
     max_length = 1191
     padded_sentence = []
@@ -19,6 +20,7 @@ def pad_sentences(sentences):
         new_sentence = sentence + ["</s>"] * num_padding
         padded_sentence.append(new_sentence)
     return padded_sentence
+
 
 if __name__ == '__main__':
     import logging
@@ -38,6 +40,6 @@ if __name__ == '__main__':
     print "done extracting vocab"
     test = mx.io.NDArrayIter(data=x, batch_size=10)
     preds = mod.predict(test)
-    preds = ['not_happy' if x[0] > .51 else 'happy' for x in preds]
+    preds = ['not_happy' if x[0] >.40 else 'happy' for x in preds]
     out = pd.DataFrame({'User_ID': ids, 'Is_Response': preds})
     out.to_csv('out.csv', index=False)

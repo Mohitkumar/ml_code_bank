@@ -108,7 +108,7 @@ def data_iter(batch_size, num_embed):
     return (train, valid, sentence_size, embed_size, vocab_size)
 
 def sym_gen(batch_size, sentence_size, num_embed,
-            vocab_size, num_label=2, filter_list=[3,4,5], num_filter = 100, dropout=0.0):
+            vocab_size, num_label=2, filter_list=[2,3,4,5], num_filter = 100, dropout=0.0):
     input_x = mx.sym.Variable('data')
     input_y = mx.sym.Variable('softmax_label')
     embed_layer = mx.sym.Embedding(data=input_x,input_dim=vocab_size,
@@ -146,16 +146,16 @@ def train(symbol, train_iter, valid_iter, data_names, label_names, batch_size, n
                optimizer='sgd',
                optimizer_params={'learning_rate':0.01},
                initializer=mx.initializer.Uniform(0.1),
-               batch_end_callback=mx.callback.Speedometer(batch_size,20),
+               batch_end_callback=mx.callback.Speedometer(batch_size,50),
                num_epoch=num_epoch,
                epoch_end_callback=save_model())
 
 
 if __name__ == '__main__':
-    batch_size = 10
-    num_embed = 256
+    batch_size = 100
+    num_embed = 128
     num_filter = 128
-    num_epoch = 20
+    num_epoch = 25
     train_iter, valid_iter, sentence_size, embed_size, vocab_size = data_iter(batch_size,num_embed)
-    symbol, data_names, label_names = sym_gen(batch_size,sentence_size,embed_size,vocab_size,num_filter=num_filter,dropout=0.0)
-    train(symbol,train_iter,valid_iter,data_names, label_names, batch_size, num_epoch=20)
+    symbol, data_names, label_names = sym_gen(batch_size,sentence_size,embed_size,vocab_size,num_filter=num_filter,dropout=0.1)
+    train(symbol,train_iter,valid_iter,data_names, label_names, batch_size, num_epoch=num_epoch)
