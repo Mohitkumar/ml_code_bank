@@ -12,7 +12,7 @@ def get_sentences():
 
 
 def pad_sentences(sentences):
-    max_length = 1191
+    max_length = 2384
     padded_sentence = []
     for i in range(len(sentences)):
         sentence = sentences[i]
@@ -29,9 +29,9 @@ if __name__ == '__main__':
     sentences = get_sentences()
     print "done"
     ids = data['User_ID']
-    sym, arg_params, aux_params = mx.model.load_checkpoint("checkpoint/checkpoint", 19)
+    sym, arg_params, aux_params = mx.model.load_checkpoint("checkpoint/checkpoint", 25)
     mod = mx.mod.Module(symbol=sym, context=mx.cpu(), label_names=None)
-    mod.bind(for_training=False, data_shapes=[('data', (10,1191))],label_shapes=mod._label_shapes)
+    mod.bind(for_training=False, data_shapes=[('data', (10,2384))],label_shapes=mod._label_shapes)
     mod.set_params(arg_params, aux_params, allow_missing=True)
     vocab = cnn.get_vocab()
     print "created vocab"
@@ -40,6 +40,6 @@ if __name__ == '__main__':
     print "done extracting vocab"
     test = mx.io.NDArrayIter(data=x, batch_size=10)
     preds = mod.predict(test)
-    preds = ['not_happy' if x[0] >.40 else 'happy' for x in preds]
+    preds = ['not_happy' if x[0] >.50 else 'happy' for x in preds]
     out = pd.DataFrame({'User_ID': ids, 'Is_Response': preds})
     out.to_csv('out.csv', index=False)
